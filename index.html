@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <base target="_top" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Mapa 01</title>
+
+  <!-- <button id="highlight-button">Resaltar Países</button> -->
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Importamos jquery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+  <!-- Importar d3.js -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+
+  <!-- Importar c3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
+
+  <!-- Importar hoja de estilos de c3 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.css" rel="stylesheet">
+
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+  <div class="content-color color-yellow">
+    <div class="content ">
+      <div class="info_mipyme color-yellow">
+        <div class="image_logo color-yellow">
+          <div class="subtitle">
+            <p>MATCOM presenta:</p>
+          </div>
+          <h1>Emprender en Cuba</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="content-color color-white section-pie">
+    <div class="content ">
+      <div class="intro_mipyme">
+        <p>Ana era una joven emprendedora que vive en Cuba. Durante muchos años, había ahorrado con la esperanza de
+          poder iniciar su propio negocio. Los recientes cambios en la política de su país, abrieron nuevas
+          oportunidades para los emprendedores locales, las MYPIMES se extendía a lo largo del país y abarcaban cada vez
+          más rápido sectores necesitados de la economía del país. <span> Ana decidió que era el momento perfecto para
+            hacer realidad su
+            sueño. </span></p>
+        <div class="pie">
+          <div class="titulo">
+            <h4>Comparación de Tipos de Empresas</h4>
+          </div>
+          <div id="pie"></div>
+        </div>
+        <p> Con sus ahorros y su mentalidad de tiburón decidió
+          crear una tienda de comida online. No tenía conocimiento sobre el mercado, ni si existían empresas que
+          ofertaran ese
+          servicio, pero sabia que era una nueva oportunidad para aprovechar sus conocimientos al maximo, y creía
+          firmemente que podía marcar la diferencia a nivel nacional. </p>
+      </div>
+    </div>
+  </div>
+  <div class="content-color color-yellow section-timemap">
+    <p> de lanzarse de lleno a su nueva
+      aventura empresarial, Ana decidió que era crucial realizar un análisis exhaustivo del mercado. Utilizando sus
+      habilidades de programación y mucho ChatGPT, se puso por completo a realizar su investigación.
+      Primeramente descargó los datos necesarios en la <a
+        href="https://www.bing.com/ck/a?!&&p=16cad32e150cbf9cJmltdHM9MTcwNDQ5OTIwMCZpZ3VpZD0xZDA1OGY1Zi01MjdjLTY5NzMtMGZhZS05Y2E4NTMxMDY4OWMmaW5zaWQ9NTE4Nw&ptn=3&ver=2&hsh=3&fclid=1d058f5f-527c-6973-0fae-9ca85310689c&psq=onei&u=a1aHR0cDovL3d3dy5vbmVpLmdvYi5jdS8&ntb=1">
+        Oficina Nacional de Estadistica e Informacion (ONEI)</a> y otros
+      de la página web de <a href="https://www.negocioscuba.cu/">negocioscuba</a>, luego los procesó y los
+      estructuró en un json para poder manipular los datos
+      con mayor facilidad. Con la información más detallada se sorprendió al ver la gran cantidad de MIPYME que
+      existían. Hasta ese entonces habían alrededor de 9357 empresas distribuidas por todo el país.</p>
+    <div class="TimeMap">
+      <div class="centered-content">
+        <div class="titulo">
+          <h4>Crecimiento de las MYPIMES desde su legalización</h4>
+        </div>
+        <form id="control-form"
+          style="font: 12px var(--sans-serif); font-variant-numeric: tabular-nums; display: flex; height: 33px; align-items: center;">
+          <button id="play-button" name="b" type="button" style="margin-right: 0.4em; border: white;
+          background-color: #f1eecbfb;">
+            <div>
+              <img id="play-pause-button" src="assets/icono-play.svg" alt="Play" width="20px" height="20px">
+            </div>
+          </button>
+          <label style="display: flex; align-items: center;">
+            <input id="range-input" name="i" type="range" min="0" max="9190" value="0" step="1" style="width: 300px;">
+            <output id="date-output" name="o" style="margin-left: 0.4em;"></output>
+          </label>
+        </form>
+      </div>
+      <div id="mapTime"></div>
+    </div>
+  </div>
+  <div class="content-color color-white">
+    <div class="centered-content">
+
+      <p>Se percató que la mayor concentración de la empresas se ubicaban en las zonas urbanas. En especial, La
+        Habana albergaba la mayoría de estas.
+        <br><br>
+        Ana necesitaba tener una visión más específica sobre el sector económico en el que se iba a involucrar, por lo
+        que decidió reagrupar las empresas en 17 sectores principales y asi poder compararlas.
+      </p>
+
+      <div class="titulo">
+        <h4>Representación visual de las categorías</h4>
+      </div>
+    </div>
+    <div id="container">
+      <div id="chart"></div>
+    </div>
+    <div class="centered-content">
+      <p> Observó que la mayor parte de las empresas estaban orientadas a la industria agropecuaria y a la
+        comercialización de alimentos.<br><br><span> Ana: ¿Será bueno invertir teniendo tanta competencia o es que tener
+          tanta
+          demanda lo hace un sector seguro?</span>
+        <br><br>
+
+        <span>Siguió investigando...</span>
+      </p>
+    </div>
+  </div>
+  <div class="content-color color-yellow section-colormap">
+    <p> Ana sabía que la mayor cantidad de clientes de su tienda online
+      estarían en las
+      provincias donde menos se ofertaran estos servicios, y tenía que preparar una logística eficiente que
+      priorizara a estas localidades.
+    </p>
+
+    <div class="centered-content">
+      <div class="graph-text">
+        <div class="titulo">
+          <h4>Distribución de las empresas por provincias</h4>
+        </div>
+      </div>
+      <div class="centered-content">
+        <div onchange="MergeCountries()">
+          <div class="catego">
+            <span>Categoría:&nbsp;</span>
+            <select id="categorySelect">
+              <option value="Comercio y gastronomía"> Comercio y gastronomía</option>
+              <option value="Servicios Técnicos"> Servicios Técnicos</option>
+              <option value="Manufactura"> Manufactura</option>
+              <option value="Transporte"> Transporte</option>
+              <option value="Salud y Belleza"> Salud y Belleza</option>
+              <option value="Educación y servicios públicos y sociales"> Educación y servicios públicos y sociales
+              </option>
+              <option value="Servicios Profesionales"> Servicios Profesionales</option>
+              <option value="Alojamiento y Turismo"> Alojamiento y Turismo</option>
+              <option value="Agropecuario, ganadería, forestal y pesca"> Agropecuario, ganadería, forestal y pesca
+              </option>
+              <option value="Medios"> Medios</option>
+              <option value="Arte, deporte, recreación y entretenimiento"> Arte, deporte, recreación y entretenimiento
+              </option>
+              <option value="Construcción"> Construcción</option>
+              <option value="Medio Ambiente y Reciclaje"> Medio Ambiente y Reciclaje</option>
+              <option value="Energía, agua y gas"> Energía, agua y gas</option>
+              <option value="Industrias"> Industrias</option>
+              <option value="Asociaciones"> Asociaciones</option>
+              <option value="Almacenamiento y Logística"> Almacenamiento y Logística</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="map-container">
+      <div id="ColorMap"></div>
+      <div id="info">
+        <div class="empresa-info">
+          <h5>Empresas</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="content-color color-white section-conclusion">
+    <div class="centered-content">
+
+      <p>Encontró que las provincias con menos servicios gastronómicas eran: la Isla de la Juventud, Mayabeque,
+        Cienfuegos y Sancti Spíritus y a su vez le resultó interesante darse cuenta que estas eran las que menos
+        servicios de almacenamiento y logística tenían y esto podría ser un obstáculo en el futuro. <br><br>Armada con
+        este conocimiento detallado del mercado local
+        y la competencia, Ana se sintió lista para dar el siguiente paso en su viaje emprendedor. Con su determinación y
+        habilidades, estaba segura de que podía convertir su visión en una exitosa MIPYME que no solo generaría
+        ingresos, sino que también contribuiría al desarrollo económico de su comunidad.</p>
+  </div>
+
+    <!-- ColorMap -->
+    <script>
+      var chartDom = document.getElementById('ColorMap');
+      var myChart = echarts.init(chartDom);
+      var option;
+
+      var categoryData = {
+        "Servicios Profesionales": [
+          { "name": "La Habana", "value": 800 },
+          { "name": "Holguín", "value": 165 },
+          { "name": "Santiago de Cuba", "value": 192 },
+          { "name": "Artemisa", "value": 126 },
+          { "name": "Camagüey", "value": 170 },
+          { "name": "Matanzas", "value": 261 },
+          { "name": "Cienfuegos", "value": 168 },
+          { "name": "Mayabeque", "value": 88 },
+          { "name": "Sancti Spíritus", "value": 96 },
+          { "name": "Pinar del Río", "value": 199 },
+          { "name": "Villa Clara", "value": 268 },
+          { "name": "Guantánamo", "value": 141 },
+          { "name": "Granma", "value": 264 },
+          { "name": "Ciego de Ávila", "value": 135 },
+          { "name": "Las Tunas", "value": 120 },
+          { "name": "Isla de la Juventud", "value": 34 }
+        ],
+        "Servicios Técnicos": [
+          { "name": "La Habana", "value": 958 },
+          { "name": "Santiago de Cuba", "value": 211 },
+          { "name": "Holguín", "value": 212 },
+          { "name": "Matanzas", "value": 247 },
+          { "name": "Pinar del Río", "value": 174 },
+          { "name": "Granma", "value": 139 },
+          { "name": "Cienfuegos", "value": 84 },
+          { "name": "Isla de la Juventud", "value": 24 },
+          { "name": "Camagüey", "value": 155 },
+          { "name": "Las Tunas", "value": 116 },
+          { "name": "Mayabeque", "value": 103 },
+          { "name": "Sancti Spíritus", "value": 104 },
+          { "name": "Guantánamo", "value": 96 },
+          { "name": "Artemisa", "value": 141 },
+          { "name": "Villa Clara", "value": 202 },
+          { "name": "Ciego de Ávila", "value": 129 }
+        ],
+        "Comercio y gastronomía": [
+          { "name": "La Habana", "value": 732 },
+          { "name": "Ciego de Ávila", "value": 228 },
+          { "name": "Holguín", "value": 305 },
+          { "name": "Santiago de Cuba", "value": 338 },
+          { "name": "Sancti Spíritus", "value": 193 },
+          { "name": "Camagüey", "value": 286 },
+          { "name": "Villa Clara", "value": 334 },
+          { "name": "Granma", "value": 279 },
+          { "name": "Matanzas", "value": 302 },
+          { "name": "Las Tunas", "value": 223 },
+          { "name": "Guantánamo", "value": 209 },
+          { "name": "Artemisa", "value": 278 },
+          { "name": "Pinar del Río", "value": 224 },
+          { "name": "Mayabeque", "value": 142 },
+          { "name": "Cienfuegos", "value": 191 },
+          { "name": "Isla de la Juventud", "value": 36 }
+        ],
+        "Agropecuario, ganadería, forestal y pesca": [
+          { "name": "Sancti Spíritus", "value": 447 },
+          { "name": "Santiago de Cuba", "value": 640 },
+          { "name": "Camagüey", "value": 566 },
+          { "name": "Villa Clara", "value": 582 },
+          { "name": "Granma", "value": 685 },
+          { "name": "Holguín", "value": 663 },
+          { "name": "Artemisa", "value": 336 },
+          { "name": "Las Tunas", "value": 358 },
+          { "name": "Matanzas", "value": 446 },
+          { "name": "La Habana", "value": 239 },
+          { "name": "Guantánamo", "value": 443 },
+          { "name": "Isla de la Juventud", "value": 44 },
+          { "name": "Pinar del Río", "value": 545 },
+          { "name": "Mayabeque", "value": 351 },
+          { "name": "Cienfuegos", "value": 290 },
+          { "name": "Ciego de Ávila", "value": 343 }
+        ],
+        "Manufactura": [
+          { "name": "La Habana", "value": 725 },
+          { "name": "Las Tunas", "value": 128 },
+          { "name": "Granma", "value": 132 },
+          { "name": "Villa Clara", "value": 253 },
+          { "name": "Mayabeque", "value": 75 },
+          { "name": "Artemisa", "value": 115 },
+          { "name": "Ciego de Ávila", "value": 92 },
+          { "name": "Matanzas", "value": 174 },
+          { "name": "Santiago de Cuba", "value": 162 },
+          { "name": "Pinar del Río", "value": 140 },
+          { "name": "Camagüey", "value": 182 },
+          { "name": "Holguín", "value": 222 },
+          { "name": "Cienfuegos", "value": 77 },
+          { "name": "Isla de la Juventud", "value": 13 },
+          { "name": "Sancti Spíritus", "value": 96 },
+          { "name": "Guantánamo", "value": 55 }
+        ],
+        "Construcción": [
+          { "name": "Holguín", "value": 98 },
+          { "name": "La Habana", "value": 248 },
+          { "name": "Ciego de Ávila", "value": 45 },
+          { "name": "Santiago de Cuba", "value": 67 },
+          { "name": "Las Tunas", "value": 31 },
+          { "name": "Matanzas", "value": 97 },
+          { "name": "Granma", "value": 66 },
+          { "name": "Villa Clara", "value": 97 },
+          { "name": "Cienfuegos", "value": 42 },
+          { "name": "Mayabeque", "value": 18 },
+          { "name": "Camagüey", "value": 48 },
+          { "name": "Pinar del Río", "value": 60 },
+          { "name": "Guantánamo", "value": 44 },
+          { "name": "Artemisa", "value": 34 },
+          { "name": "Sancti Spíritus", "value": 29 },
+          { "name": "Isla de la Juventud", "value": 8 }
+        ],
+        "Arte, deporte, recreación y entretenimiento": [
+          { "name": "Holguín", "value": 101 },
+          { "name": "La Habana", "value": 325 },
+          { "name": "Sancti Spíritus", "value": 53 },
+          { "name": "Villa Clara", "value": 65 },
+          { "name": "Artemisa", "value": 26 },
+          { "name": "Matanzas", "value": 74 },
+          { "name": "Santiago de Cuba", "value": 87 },
+          { "name": "Mayabeque", "value": 25 },
+          { "name": "Cienfuegos", "value": 51 },
+          { "name": "Camagüey", "value": 79 },
+          { "name": "Isla de la Juventud", "value": 14 },
+          { "name": "Pinar del Río", "value": 59 },
+          { "name": "Ciego de Ávila", "value": 46 },
+          { "name": "Guantánamo", "value": 36 },
+          { "name": "Granma", "value": 69 },
+          { "name": "Las Tunas", "value": 42 }
+        ],
+        "Transporte": [
+          { "name": "La Habana", "value": 376 },
+          { "name": "Ciego de Ávila", "value": 90 },
+          { "name": "Guantánamo", "value": 59 },
+          { "name": "Mayabeque", "value": 71 },
+          { "name": "Sancti Spíritus", "value": 67 },
+          { "name": "Las Tunas", "value": 124 },
+          { "name": "Villa Clara", "value": 134 },
+          { "name": "Granma", "value": 120 },
+          { "name": "Matanzas", "value": 189 },
+          { "name": "Artemisa", "value": 78 },
+          { "name": "Cienfuegos", "value": 133 },
+          { "name": "Pinar del Río", "value": 82 },
+          { "name": "Santiago de Cuba", "value": 173 },
+          { "name": "Holguín", "value": 230 },
+          { "name": "Camagüey", "value": 161 },
+          { "name": "Isla de la Juventud", "value": 17 }
+        ],
+        "Energía, agua y gas": [
+          { "name": "Camagüey", "value": 33 },
+          { "name": "Villa Clara", "value": 27 },
+          { "name": "La Habana", "value": 46 },
+          { "name": "Matanzas", "value": 30 },
+          { "name": "Granma", "value": 51 },
+          { "name": "Las Tunas", "value": 21 },
+          { "name": "Cienfuegos", "value": 24 },
+          { "name": "Pinar del Río", "value": 33 },
+          { "name": "Isla de la Juventud", "value": 4 },
+          { "name": "Guantánamo", "value": 31 },
+          { "name": "Mayabeque", "value": 29 },
+          { "name": "Ciego de Ávila", "value": 24 },
+          { "name": "Santiago de Cuba", "value": 33 },
+          { "name": "Holguín", "value": 48 },
+          { "name": "Artemisa", "value": 25 },
+          { "name": "Sancti Spíritus", "value": 21 }
+        ],
+        "Medio Ambiente y Reciclaje": [
+          { "name": "La Habana", "value": 46 },
+          { "name": "Cienfuegos", "value": 20 },
+          { "name": "Matanzas", "value": 35 },
+          { "name": "Granma", "value": 19 },
+          { "name": "Guantánamo", "value": 21 },
+          { "name": "Camagüey", "value": 13 },
+          { "name": "Isla de la Juventud", "value": 3 },
+          { "name": "Artemisa", "value": 25 },
+          { "name": "Villa Clara", "value": 29 },
+          { "name": "Mayabeque", "value": 23 },
+          { "name": "Sancti Spíritus", "value": 11 },
+          { "name": "Pinar del Río", "value": 22 },
+          { "name": "Holguín", "value": 29 },
+          { "name": "Santiago de Cuba", "value": 22 },
+          { "name": "Ciego de Ávila", "value": 12 },
+          { "name": "Las Tunas", "value": 16 }
+        ],
+        "Alojamiento y Turismo": [
+          { "name": "Holguín", "value": 52 },
+          { "name": "La Habana", "value": 276 },
+          { "name": "Sancti Spíritus", "value": 45 },
+          { "name": "Villa Clara", "value": 34 },
+          { "name": "Pinar del Río", "value": 61 },
+          { "name": "Granma", "value": 31 },
+          { "name": "Las Tunas", "value": 24 },
+          { "name": "Mayabeque", "value": 17 },
+          { "name": "Santiago de Cuba", "value": 49 },
+          { "name": "Matanzas", "value": 87 },
+          { "name": "Ciego de Ávila", "value": 34 },
+          { "name": "Artemisa", "value": 31 },
+          { "name": "Camagüey", "value": 47 },
+          { "name": "Cienfuegos", "value": 21 },
+          { "name": "Guantánamo", "value": 26 },
+          { "name": "Isla de la Juventud", "value": 8 }
+        ],
+        "Industrias": [
+          { "name": "La Habana", "value": 209 },
+          { "name": "Cienfuegos", "value": 34 },
+          { "name": "Camagüey", "value": 33 },
+          { "name": "Sancti Spíritus", "value": 23 },
+          { "name": "Villa Clara", "value": 66 },
+          { "name": "Santiago de Cuba", "value": 43 },
+          { "name": "Las Tunas", "value": 16 },
+          { "name": "Granma", "value": 38 },
+          { "name": "Pinar del Río", "value": 43 },
+          { "name": "Mayabeque", "value": 29 },
+          { "name": "Matanzas", "value": 49 },
+          { "name": "Ciego de Ávila", "value": 24 },
+          { "name": "Holguín", "value": 38 },
+          { "name": "Artemisa", "value": 19 },
+          { "name": "Isla de la Juventud", "value": 6 },
+          { "name": "Guantánamo", "value": 16 }
+        ],
+        "Educación y servicios públicos y sociales": [
+          { "name": "La Habana", "value": 456 },
+          { "name": "Artemisa", "value": 50 },
+          { "name": "Granma", "value": 95 },
+          { "name": "Villa Clara", "value": 138 },
+          { "name": "Ciego de Ávila", "value": 51 },
+          { "name": "Sancti Spíritus", "value": 65 },
+          { "name": "Santiago de Cuba", "value": 144 },
+          { "name": "Pinar del Río", "value": 92 },
+          { "name": "Holguín", "value": 121 },
+          { "name": "Mayabeque", "value": 42 },
+          { "name": "Matanzas", "value": 105 },
+          { "name": "Isla de la Juventud", "value": 14 },
+          { "name": "Guantánamo", "value": 82 },
+          { "name": "Cienfuegos", "value": 82 },
+          { "name": "Camagüey", "value": 64 },
+          { "name": "Las Tunas", "value": 88 }
+        ],
+        "Salud y Belleza": [
+          { "name": "La Habana", "value": 484 },
+          { "name": "Camagüey", "value": 95 },
+          { "name": "Artemisa", "value": 72 },
+          { "name": "Matanzas", "value": 141 },
+          { "name": "Holguín", "value": 95 },
+          { "name": "Villa Clara", "value": 134 },
+          { "name": "Ciego de Ávila", "value": 90 },
+          { "name": "Cienfuegos", "value": 94 },
+          { "name": "Mayabeque", "value": 46 },
+          { "name": "Sancti Spíritus", "value": 84 },
+          { "name": "Santiago de Cuba", "value": 142 },
+          { "name": "Isla de la Juventud", "value": 34 },
+          { "name": "Guantánamo", "value": 62 },
+          { "name": "Granma", "value": 121 },
+          { "name": "Pinar del Río", "value": 95 },
+          { "name": "Las Tunas", "value": 76 }
+        ],
+        "Asociaciones": [
+          { "name": "Sancti Spíritus", "value": 5 },
+          { "name": "La Habana", "value": 56 },
+          { "name": "Matanzas", "value": 13 },
+          { "name": "Villa Clara", "value": 6 },
+          { "name": "Las Tunas", "value": 3 },
+          { "name": "Artemisa", "value": 3 },
+          { "name": "Holguín", "value": 6 },
+          { "name": "Mayabeque", "value": 6 },
+          { "name": "Camagüey", "value": 14 },
+          { "name": "Cienfuegos", "value": 16 },
+          { "name": "Granma", "value": 6 },
+          { "name": "Pinar del Río", "value": 13 },
+          { "name": "Isla de la Juventud", "value": 2 },
+          { "name": "Santiago de Cuba", "value": 5 },
+          { "name": "Ciego de Ávila", "value": 2 },
+          { "name": "Guantánamo", "value": 2 }
+        ],
+        "Medios": [
+          { "name": "Matanzas", "value": 36 },
+          { "name": "La Habana", "value": 133 },
+          { "name": "Santiago de Cuba", "value": 45 },
+          { "name": "Cienfuegos", "value": 19 },
+          { "name": "Guantánamo", "value": 28 },
+          { "name": "Ciego de Ávila", "value": 16 },
+          { "name": "Artemisa", "value": 18 },
+          { "name": "Villa Clara", "value": 32 },
+          { "name": "Granma", "value": 35 },
+          { "name": "Camagüey", "value": 27 },
+          { "name": "Las Tunas", "value": 19 },
+          { "name": "Pinar del Río", "value": 23 },
+          { "name": "Mayabeque", "value": 9 },
+          { "name": "Isla de la Juventud", "value": 5 },
+          { "name": "Holguín", "value": 33 },
+          { "name": "Sancti Spíritus", "value": 14 }
+        ],
+        "Almacenamiento y Logística": [
+          { "name": "Santiago de Cuba", "value": 4 },
+          { "name": "Matanzas", "value": 3 },
+          { "name": "Las Tunas", "value": 2 },
+          { "name": "Mayabeque", "value": 2 },
+          { "name": "La Habana", "value": 8 },
+          { "name": "Artemisa", "value": 6 },
+          { "name": "Pinar del Río", "value": 1 },
+          { "name": "Villa Clara", "value": 5 },
+          { "name": "Isla de la Juventud", "value": 1 },
+          { "name": "Cienfuegos", "value": 1 },
+          { "name": "Granma", "value": 2 },
+          { "name": "Holguín", "value": 2 },
+          { "name": "Camagüey", "value": 1 },
+          { "name": "Sancti Spíritus", "value": 0 },
+          { "name": "Ciego de Ávila", "value": 0 },
+          { "name": "Guantánamo", "value": 0 }
+        ],
+        "Otros": [
+          { "name": "Pinar del Río", "value": 1 },
+          { "name": "La Habana", "value": 1 },
+          { "name": "Matanzas", "value": 1 },
+          { "name": "Santiago de Cuba", "value": 1 },
+          { "name": "Holguín", "value": 0 },
+          { "name": "Sancti Spíritus", "value": 0 },
+          { "name": "Villa Clara", "value": 0 },
+          { "name": "Artemisa", "value": 0 },
+          { "name": "Mayabeque", "value": 0 },
+          { "name": "Cienfuegos", "value": 0 },
+          { "name": "Camagüey", "value": 0 },
+          { "name": "Isla de la Juventud", "value": 0 },
+          { "name": "Ciego de Ávila", "value": 0 },
+          { "name": "Guantánamo", "value": 0 },
+          { "name": "Granma", "value": 0 },
+          { "name": "Las Tunas", "value": 0 }
+        ]
+      }
+      let category;
+      function MergeCountries() {
+        var select = document.getElementById("categorySelect");
+        var selectedCategory = select.options[select.selectedIndex].value;
+        console.log(select.options[select.selectedIndex].value);
+        var data = categoryData[selectedCategory];
+        fetch('data/InteractiveMap.json')
+          .then(response => response.json())
+          .then(data => {
+            // Ahora puedes usar tu data
+            category = data[selectedCategory.replace(/_/g, " ")];
+
+            var children;
+            category.forEach(element => {
+              if (element.name == 'La Habana') {
+                children = element.children;
+              }
+            });
+            const infoDiv = document.getElementById('info');
+            while (infoDiv.children[1]) {
+              infoDiv.removeChild(infoDiv.children[1]);
+            }
+            // Crea y agrega un elemento de lista para cada nombre
+            var colorClaro = true
+            children.forEach(name => {
+              const listItem = document.createElement('li');
+              if (colorClaro) {
+                listItem.classList.add('colorClaro')
+                colorClaro = false
+              }
+              else {
+                listItem.classList.add('colorOscuro')
+                colorClaro = true
+              }
+              listItem.textContent = name;
+              infoDiv.appendChild(listItem);
+            });
+
+          }
+          )
+          .catch(error => console.error('Error:', error));
+
+        option.series[0].data = data;
+
+        myChart.setOption(option);
+      }
+      myChart.on('click', function (params) {
+        var children;
+        category.forEach(element => {
+          if (element.name == params.name) {
+            children = element.children;
+          }
+        });
+        const infoDiv = document.getElementById('info');
+        while (infoDiv.children[1]) {
+          infoDiv.removeChild(infoDiv.children[1]);
+        }
+        // Crea y agrega un elemento de lista para cada nombre
+        var colorClaro = true
+        children.forEach(name => {
+          const listItem = document.createElement('li');
+          if (colorClaro) {
+            listItem.classList.add('colorClaro')
+            colorClaro = false
+          }
+          else {
+            listItem.classList.add('colorOscuro')
+            colorClaro = true
+          }
+          listItem.textContent = name;
+          infoDiv.appendChild(listItem);
+        });
+      });
+
+
+
+      myChart.showLoading();
+      $.get('cuba-geojsons/geojson_by_region_division/by_provinces/cuba.geojson', function (CubaJson) {
+        myChart.hideLoading();
+        echarts.registerMap('Cuba', CubaJson);
+
+        option = {
+          tooltip: {
+            trigger: 'item',
+            showDelay: 0,
+            transition: 0.2
+
+          },
+          visualMap: {
+            left: 'center',
+            min: 0,
+            max: 300,
+            inRange: {
+              color: [
+                '#e0f3f8',
+                '#313695',
+              ]
+            },
+            text: ['High', 'Low'],
+            calculable: true,
+            orient: 'horizontal',
+            itemHeight: 500
+          },
+          toolbox: {
+            show: false,
+            //orient: 'vertical',
+            left: 'left',
+            top: 'top',
+            feature: {
+              dataView: { readOnly: false },
+              restore: {},
+              saveAsImage: {}
+            }
+          },
+          series: [
+            {
+              top: '-5%',
+              name: 'Cuba',
+              type: 'map',
+              roam: false,
+              map: 'Cuba',
+              zoom: 1,
+              emphasis: {
+                label: {
+                  show: true
+                }
+              },
+              data: []
+            }
+          ]
+        };
+        MergeCountries();
+        myChart.setOption(option);
+        myChart.resize({
+          height: '700',
+          width: '1600'
+        });
+      });
+      option && myChart.setOption(option);
+
+    </script>
+    <!-- PieMap -->
+    <script>
+      var chart = c3.generate({
+        bindto: '#pie',
+        data: {
+          columns: [
+            ['Micro Empresas', 1743],
+            ['Pequeñas Empresas', 4250],
+            ['Medianas Empresas', 3037],
+            ['Cooperativas no Agropecuarias', 220]
+          ],
+          type: 'pie'
+        },
+        size: {
+          width: 900,  // Ancho del gráfico
+          height: 400  // Altura del gráfico
+        }
+      });
+    </script>
+    <!-- TimeMap -->
+    <script>
+      let data2;
+      fetch('data/BDtabla_modificado_coordinates.json')
+        .then(response => response.json())
+        .then(json => {
+
+          data2 = json;
+
+          d3.json("cuba-geojsons/geojson_by_region_division/by_provinces/cuba.geojson").then(function (Cuba) {
+            const projection = d3.geoMercator().center([-79.6, 20.5]).scale(5000).translate([960 / 2, 600 / 2]);
+            const path = d3.geoPath().projection(projection);
+
+            const svg = d3.select("#mapTime").append("svg")
+              .attr("viewBox", [0, 0, 960, 400]);
+
+
+            svg.append("path")
+              .datum(Cuba)
+              .attr("fill", "#ddd")
+              .attr("d", path
+              );
+
+            svg.append("path")
+              .datum(Cuba)
+              .attr("fill", "none")
+              .attr("stroke", "white")
+              .attr("stroke-linejoin", "round")
+              .attr("d", path);
+
+            const g = svg.append("g")
+              .attr("fill", "none")
+              .attr("stroke", "#616161");
+
+            const dot = g.selectAll("circle")
+              .data(data2)
+              .join("circle")
+              .attr("r", 0)
+              .attr("transform", d => {
+                // Usa la proyección para transformar las coordenadas
+                const [x, y] = projection(d);
+                return `translate(${x}, ${y})`;
+              });
+
+            svg.append("circle")
+              .attr("fill", "blue")
+              .attr("r", 0)
+              .attr("transform", d => {
+                // Usa la proyección para transformar las coordenadas
+                const [x, y] = projection(data2[0]);
+                return `translate(${x}, ${y})`;
+              });
+
+            let previousIndex = -Infinity;
+            console.log(data2)
+            svg.node().update = function (index) {
+              dot // enter
+                .filter((d, i) => i > previousIndex && i <= index)
+                .transition().attr("r", 3);
+              dot // exit
+                .filter((d, i) => i <= previousIndex && i > index)
+                .transition().attr("r", 0);
+              previousIndex = index;
+            };
+
+            const rangeInput = document.getElementById('range-input');
+            const playButton = document.getElementById('play-button');
+            const playPuseButton = document.getElementById('play-pause-button');
+            let isPlaying = false;
+            let intervalId;
+
+            rangeInput.addEventListener('input', function () {
+              const index = this.value;
+              svg.node().update(index);
+              // console.log(index)
+            });
+
+            playButton.addEventListener('click', function () {
+              isPlaying = !isPlaying;
+              // this.textContent = isPlaying ? 'Pause' : 'Play';
+
+              playPuseButton.setAttribute('src', isPlaying ? 'assets/icono-play.svg' : 'assets/icono-pause.svg');
+
+              if (isPlaying) {
+                intervalId = setInterval(function () {
+                  let index = +rangeInput.value;
+                  if (index >= +rangeInput.max) {
+                    index = +rangeInput.min;
+                  } else {
+                    index++;
+                  }
+                  rangeInput.value = index;
+                  console.log(index)
+                  svg.node().update(index);
+                }, 0.01); // Cambia el intervalo según sea necesario
+              } else {
+                clearInterval(intervalId);
+              }
+            });
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    </script>
+    <!-- Gear_Graphics -->
+    <script>
+      let data;
+      fetch('data/mezclado_category.json')
+        .then(response => response.json())
+        .then(json => {
+          data = json;
+          load_gear()
+        })
+        .catch(error => console.error('Error:', error));
+      function load_gear() {
+        const container = d3.select('#container');
+
+        const width = container.node().getBoundingClientRect().width;
+        const height = container.node().getBoundingClientRect().height;
+        const margin = 1; // para evitar cortar el trazo del círculo raíz
+
+        // Especificar el formato de número para los valores
+        const format = d3.format(",d");
+
+        // Crear el diseño del paquete
+        const pack = d3.pack()
+          .size([width / 1.25, height * 1.1])
+          .padding(1);
+        // Calcular la jerarquía a partir de los datos (planos); exponer los valores
+        // para cada nodo; finalmente aplicar el diseño del paquete
+        const modifiedData = Object.entries(data).map(([key, value]) => ({ name: key.replace(/\s/g, "_"), value: value.length }));
+        const root = pack(d3.hierarchy({ children: modifiedData })
+          .sum(d => d.value));
+
+        // Crear el contenedor SVG
+        const svg = d3.create("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("viewBox", `0, 0, ${width}, ${height}`)
+          .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;")
+          .attr("text-anchor", "middle");
+
+        // Colocar cada nodo (hoja) de acuerdo a los valores x e y del diseño
+        const node = svg.append("g")
+          .selectAll()
+          .data(root.leaves())
+          .enter()
+          .append("g")
+          .attr("transform", d => `translate(${1.2 * d.x},${d.y / 1.1})`);
+
+        // Define el patrón de relleno
+        var defs = svg.append("defs");
+
+        node.each(function (d) {
+          let image = ''
+          switch (d.data.name) {
+            case 'Servicios_Profesionales': { image = 'assets/profesional.svg' };
+              break;
+            case 'Servicios_técnicos': { image = 'assets/tecnicos.svg' };
+              break;
+            case 'Agropecuario,_ganaderia,_forestal_y_pesca.': { image = 'assets/agricultura.svg' };
+              break;
+            case 'Manufactura': { image = 'assets/manufacturera.svg' };
+              break;
+            case 'Construcción': { image = 'assets/construcion.svg' };
+              break;
+            case 'Arte,_deporte,_recreación_y_entretenimiento': { image = 'assets/deporte.svg' };
+              break;
+            case 'Transporte': { image = 'assets/trasporte.svg' };
+              break;
+            case 'Energía,_agua_y_gas': { image = 'assets/energia.svg' };
+              break;
+            case 'Medio_Ambiente_y_Reciclaje': { image = 'assets/reciclaje.svg' };
+              break;
+            case 'Industrias': { image = 'assets/industria.svg' };
+              break;
+            case 'Educación_y_servicios_públicos_y_sociales': { image = 'assets/educacion.svg' };
+              break;
+            case 'Salud_y_Belleza': { image = 'assets/belleza.svg' };
+              break;
+            case 'Asociaciones': { image = 'assets/asociaciones.svg' };
+              break;
+            case 'Medios': { image = 'assets/medios_difusion.svg' };
+              break;
+            case 'Almacenamiento_y_Logística': { image = 'assets/logistica.svg' };
+              break;
+            case 'Comercio_y_gastronomía': { image = 'assets/gastronomia.svg' };
+              break;
+            case 'Alojamiento_y_Turismo': { image = 'assets/hoteleria.svg' };
+              break;
+            case 'Almacenamiento_y_Logística': { image = 'assets/logistica.svg' };
+              break;
+            default: { image = 'assets/hoteleria.svg' };
+          }
+          var pattern = defs.append("pattern")
+            .attr("id", d.data.name) // Asegúrate de que cada id de patrón sea único
+            .attr("height", "100%")
+            .attr("width", "100%")
+            .attr("patternContentUnits", "objectBoundingBox");
+
+          pattern.append("image")
+            .attr("height", 1)
+            .attr("width", 1)
+            .attr("preserveAspectRatio", "none")
+            .attr("xlink:href", image); // Asume que d.data.image contiene la ruta a la imagen
+        });
+
+        var tooltip = d3.select("body").append("div")
+          .attr("class", "tooltip")
+          .style("position", "absolute")
+          .style("opacity", 0)
+          .style("background", "#f9f9f9")
+          .style("border", "solid")
+          .style("border-width", "2px")
+          .style("border-radius", "5px")
+          .style("padding", "5px");
+
+        let activeCircle;
+        // Añade el círculo con la imagen dentro
+        node.append("circle")
+          .attr("r", d => d.r)
+          .attr("fill", d => "url(#" + d.data.name + ")") // Usa el id de patrón correspondiente
+          .on("mouseover", function (d) {
+            d3.select(this.parentNode)
+              .raise() // Evento de mouseover
+            activeCircle = d3.select(this);
+            activeCircle
+              .transition()
+              .duration(20)
+
+              .attr("r", d => d.r * 1.2); // Aumenta el radio en un 10%
+
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", .9);
+            tooltip.html(d.data.name.replace(/_/g, " "))
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+          })
+          .on("mousemove", function (event) { // Evento de mousemove
+            tooltip
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 48) + "px");
+          })
+          .on("mouseout", function () { // Evento de mouseout
+            if (activeCircle)
+              activeCircle
+                .transition()
+                .duration(20)
+                .attr("r", d => d.r); // Vuelve al tamaño original
+
+            tooltip.transition()
+              .duration(20)
+              .style("opacity", 0);
+          });
+        const chartElement = document.getElementById("chart");
+        chartElement.appendChild(svg.node());
+
+        window.addEventListener('scroll', function () {
+          node.each(function (d) {
+            var rect = this.getBoundingClientRect();
+            if (rect.bottom <= window.innerHeight) {
+              d3.select(this).selectAll('circle')
+                .transition()
+                .delay((d, i) => i)
+                .attr("r", d => d.r);
+            }
+          });
+        });
+      }
+    </script>
+</body>
+
+</html>
