@@ -605,7 +605,7 @@
 
 
       myChart.showLoading();
-      $.get('cuba-geojsons/geojson_by_region_division/by_provinces/cuba.geojson', function (CubaJson) {
+      $.get('data/cuba.geojson', function (CubaJson) {
         myChart.hideLoading();
         echarts.registerMap('Cuba', CubaJson);
 
@@ -697,7 +697,7 @@
 
           data2 = json;
 
-          d3.json("cuba-geojsons/geojson_by_region_division/by_provinces/cuba.geojson").then(function (Cuba) {
+          d3.json("data/cuba.geojson").then(function (Cuba) {
             const projection = d3.geoMercator().center([-79.6, 20.5]).scale(5000).translate([960 / 2, 600 / 2]);
             const path = d3.geoPath().projection(projection);
 
